@@ -109,6 +109,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         $final_content = str_replace(array_keys($placeholders), array_values($placeholders), $content);
 
         // 5. Output the final document in a clean preview page
+        $cssHref = url_for('assets/css/app.css');
         echo <<<HTML
         <!DOCTYPE html>
         <html lang="en">
@@ -116,9 +117,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>Document Preview</title>
-            <script src="https://cdn.tailwindcss.com"></script>
+            <link rel="stylesheet" href="{$cssHref}">
             <style>
-                body { font-family: 'Inter', sans-serif; }
+                body { font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Noto Sans, Ubuntu, Cantarell, Helvetica Neue, Arial, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji; }
                 @media print {
                     .no-print { display: none; }
                     body { margin: 0; }
