@@ -57,14 +57,14 @@ if (isset($_GET['id'])) {
         <div class="bg-white p-8 rounded-lg shadow-md">
             <h2 class="text-2xl font-bold mb-6 text-gray-800"><?php echo $pageTitle; ?></h2>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <div>
-                    <label for="name" class="block text-sm font-medium text-gray-700">Template Name</label>
-                    <input type="text" name="name" id="name" value="<?php echo e($template['name']); ?>" required class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+            <div class="form-grid form-grid-2 mb-6">
+                <div class="form-group">
+                    <label for="name">Template Name</label>
+                    <input type="text" name="name" id="name" value="<?php echo e($template['name']); ?>" required class="w-full enhanced-input">
                 </div>
-                <div>
-                    <label for="type" class="block text-sm font-medium text-gray-700">Document Type (e.g., Offer Letter)</label>
-                    <input type="text" name="type" id="type" value="<?php echo e($template['type']); ?>" required class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                <div class="form-group">
+                    <label for="type">Document Type (e.g., Offer Letter)</label>
+                    <input type="text" name="type" id="type" value="<?php echo e($template['type']); ?>" required class="w-full enhanced-input">
                 </div>
             </div>
 

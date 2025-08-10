@@ -72,13 +72,13 @@ $stmt->close();
                 <form action="actions/user_action.php" method="POST">
                     <input type="hidden" name="action" value="update_profile">
                     <div class="space-y-4">
-                        <div>
-                            <label for="name" class="block text-sm font-medium text-gray-700">Full Name</label>
-                            <input type="text" name="name" id="name" value="<?php echo e($user['name']); ?>" required class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                        <div class="form-group">
+                            <label for="name">Full Name</label>
+                            <input type="text" name="name" id="name" value="<?php echo e($user['name']); ?>" required class="w-full enhanced-input">
                         </div>
-                        <div>
-                            <label for="email" class="block text-sm font-medium text-gray-700">Email Address (Read-only)</label>
-                            <input type="email" name="email" id="email" value="<?php echo e($user['email']); ?>" readonly class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md bg-gray-100 cursor-not-allowed">
+                        <div class="form-group">
+                            <label for="email">Email Address (Read-only)</label>
+                            <input type="email" name="email" id="email" value="<?php echo e($user['email']); ?>" readonly class="w-full enhanced-input" disabled>
                         </div>
                         <div class="text-right">
                             <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
@@ -100,17 +100,17 @@ $stmt->close();
                 <form action="actions/user_action.php" method="POST">
                     <input type="hidden" name="action" value="change_password">
                     <div class="space-y-4">
-                        <div>
-                            <label for="current_password" class="block text-sm font-medium text-gray-700">Current Password</label>
-                            <input type="password" name="current_password" id="current_password" required class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                        <div class="form-group">
+                            <label for="current_password">Current Password</label>
+                            <input type="password" name="current_password" id="current_password" required class="w-full enhanced-input">
                         </div>
-                        <div>
-                            <label for="new_password" class="block text-sm font-medium text-gray-700">New Password</label>
-                            <input type="password" name="new_password" id="new_password" required class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                        <div class="form-group">
+                            <label for="new_password">New Password</label>
+                            <input type="password" name="new_password" id="new_password" required class="w-full enhanced-input">
                         </div>
-                        <div>
-                            <label for="confirm_password" class="block text-sm font-medium text-gray-700">Confirm New Password</label>
-                            <input type="password" name="confirm_password" id="confirm_password" required class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                        <div class="form-group">
+                            <label for="confirm_password">Confirm New Password</label>
+                            <input type="password" name="confirm_password" id="confirm_password" required class="w-full enhanced-input">
                         </div>
                         <div class="text-right">
                             <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">

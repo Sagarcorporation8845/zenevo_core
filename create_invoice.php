@@ -41,13 +41,13 @@ $projects_result = $conn->query("SELECT p.id, p.name as project_name, c.name as 
                         <?php endwhile; ?>
                     </select>
                 </div>
-                <div>
-                    <label for="issue_date" class="block text-sm font-medium text-gray-700">Issue Date</label>
-                    <input type="date" name="issue_date" id="issue_date" required value="<?php echo date('Y-m-d'); ?>" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                <div class="form-group">
+                    <label for="issue_date">Issue Date</label>
+                    <input type="date" name="issue_date" id="issue_date" required value="<?php echo date('Y-m-d'); ?>" class="w-full enhanced-input">
                 </div>
-                <div>
-                    <label for="due_date" class="block text-sm font-medium text-gray-700">Due Date</label>
-                    <input type="date" name="due_date" id="due_date" required class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                <div class="form-group">
+                    <label for="due_date">Due Date</label>
+                    <input type="date" name="due_date" id="due_date" required class="w-full enhanced-input">
                 </div>
             </div>
 
@@ -113,9 +113,9 @@ document.addEventListener('DOMContentLoaded', function() {
     function addNewItem() {
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td class="px-4 py-2 border-b"><input type="text" name="descriptions[]" class="w-full p-1 border rounded-md" placeholder="Item description" required></td>
-            <td class="px-4 py-2 border-b"><input type="number" name="quantities[]" class="w-24 p-1 border rounded-md item-qty" placeholder="1" value="1" min="1" required></td>
-            <td class="px-4 py-2 border-b"><input type="number" name="unit_prices[]" class="w-32 p-1 border rounded-md item-price" placeholder="0.00" step="0.01" min="0" required></td>
+            <td class="px-4 py-2 border-b"><input type="text" name="descriptions[]" class="w-full table-input" placeholder="Item description" required></td>
+            <td class="px-4 py-2 border-b"><input type="number" name="quantities[]" class="w-24 table-input item-qty" placeholder="1" value="1" min="1" required></td>
+            <td class="px-4 py-2 border-b"><input type="number" name="unit_prices[]" class="w-32 table-input item-price" placeholder="0.00" step="0.01" min="0" required></td>
             <td class="px-4 py-2 border-b text-right"><span class="item-total font-semibold">$0.00</span></td>
             <td class="px-4 py-2 border-b text-center"><button type="button" class="text-red-500 hover:text-red-700 remove-item-btn font-bold">X</button></td>
         `;
