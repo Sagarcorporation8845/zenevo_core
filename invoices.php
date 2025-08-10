@@ -79,7 +79,7 @@ $result = $conn->query($sql);
                                     <p class="text-gray-600 whitespace-no-wrap text-xs"><?php echo e($row['project_name']); ?></p>
                                 </td>
                                 <td class="px-5 py-4 border-b border-gray-200 bg-white text-sm">
-                                    <p class="text-gray-900 whitespace-no-wrap font-bold">$<?php echo number_format(e($row['total_amount']), 2); ?></p>
+                                    <p class="text-gray-900 whitespace-no-wrap font-bold">₹<?php echo number_format((float)$row['total_amount'], 2); ?></p>
                                 </td>
                                 <td class="px-5 py-4 border-b border-gray-200 bg-white text-sm">
                                     <p class="text-gray-900 whitespace-no-wrap"><?php echo date('M d, Y', strtotime(e($row['issue_date']))); ?></p>
