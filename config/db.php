@@ -7,6 +7,11 @@ if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
+// Force application timezone to IST
+if (function_exists('date_default_timezone_set')) {
+    date_default_timezone_set('Asia/Kolkata');
+}
+
 // --- Database Configuration ---
 define('DB_HOST', '127.0.0.1');
 define('DB_USER', 'root'); // Your database username
@@ -22,6 +27,9 @@ if ($conn->connect_error) {
     // and show a more user-friendly message.
     die("Connection failed: " . $conn->connect_error);
 }
+
+// Ensure MySQL session also uses IST for NOW(), CURDATE(), etc.
+@$conn->query("SET time_zone = '+05:30'");
 
 // --- Helper Functions ---
 

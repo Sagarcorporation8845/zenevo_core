@@ -46,7 +46,7 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
         <?php endif; ?>
 
         <a href="<?php echo url_for('my_attendance.php'); ?>" class="sidebar-link flex items-center px-4 py-2.5 rounded-md hover:bg-gray-700 <?php echo ($current_page == 'my_attendance.php') ? 'active' : ''; ?>">
-            My Attendance
+            Attendance
         </a>
 
         <?php if (has_permission($conn, 'manage_employees')): ?>

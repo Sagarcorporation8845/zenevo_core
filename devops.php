@@ -6,16 +6,33 @@ include 'includes/header.php';
 $conn->query("CREATE TABLE IF NOT EXISTS sprints (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(150) NOT NULL, start_date DATE NOT NULL, end_date DATE NOT NULL, created_by INT NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)");
 $conn->query("CREATE TABLE IF NOT EXISTS tasks (id INT AUTO_INCREMENT PRIMARY KEY, sprint_id INT NULL, title VARCHAR(200) NOT NULL, description TEXT NULL, status ENUM('Todo','In Progress','Blocked','Done') DEFAULT 'Todo', assignee_employee_id INT NULL, created_by INT NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)");
 
-if (!check_role_access($conn, ['Admin','Team Lead','HR Manager'])) {
-    echo '<div class="p-6 bg-white rounded-lg shadow">You do not have permission to view this page.</div>';
-    include 'includes/footer.php';
-    exit;
+$roleViewAll = check_role_access($conn, ['Admin','Team Lead','HR Manager']);
+$currentUserId = $_SESSION['user_id'];
+$currentEmployeeId = null;
+if ($st = $conn->prepare('SELECT id FROM employees WHERE user_id = ? LIMIT 1')) {
+  $st->bind_param('i', $currentUserId);
+  $st->execute();
+  $st->bind_result($currentEmployeeId);
+  $st->fetch();
+  $st->close();
 }
 
 // Fetch data
 $sprints = $conn->query('SELECT * FROM sprints ORDER BY start_date DESC');
-$tasks = $conn->query('SELECT t.*, CONCAT(e.first_name, " ", e.last_name) AS assignee
-                       FROM tasks t LEFT JOIN employees e ON t.assignee_employee_id=e.id ORDER BY t.created_at DESC LIMIT 100');
+
+if ($roleViewAll) {
+  $tasks = $conn->query('SELECT t.*, CONCAT(e.first_name, " ", e.last_name) AS assignee
+                         FROM tasks t LEFT JOIN employees e ON t.assignee_employee_id=e.id ORDER BY t.created_at DESC LIMIT 200');
+} else {
+  // Employees see tasks assigned to them or unassigned (broadcast)
+  $ts = $conn->prepare('SELECT t.*, CONCAT(e.first_name, " ", e.last_name) AS assignee
+                        FROM tasks t LEFT JOIN employees e ON t.assignee_employee_id=e.id
+                        WHERE t.assignee_employee_id = ? OR t.assignee_employee_id IS NULL
+                        ORDER BY t.created_at DESC LIMIT 200');
+  $ts->bind_param('i', $currentEmployeeId);
+  $ts->execute();
+  $tasks = $ts->get_result();
+}
 ?>
 <div class="container mx-auto">
   <div class="flex justify-between items-center mb-6">
@@ -23,6 +40,7 @@ $tasks = $conn->query('SELECT t.*, CONCAT(e.first_name, " ", e.last_name) AS ass
   </div>
 
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <?php if ($roleViewAll): ?>
     <!-- Create Sprint -->
     <div class="bg-white p-6 rounded shadow">
       <h3 class="text-lg font-semibold mb-4">Create Sprint</h3>
@@ -66,10 +84,23 @@ $tasks = $conn->query('SELECT t.*, CONCAT(e.first_name, " ", e.last_name) AS ass
         <?php endwhile; ?>
       </ul>
     </div>
+    <?php else: ?>
+      <!-- If not lead/manager, show only sprints list occupying full width on small screens -->
+      <div class="bg-white p-6 rounded shadow lg:col-span-3">
+        <h3 class="text-lg font-semibold mb-4">Active Sprints</h3>
+        <ul class="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <?php while($s = $sprints->fetch_assoc()): ?>
+            <li class="border rounded p-3"><div class="font-semibold"><?php echo e($s['name']); ?></div>
+              <div class="text-xs text-gray-500"><?php echo e($s['start_date']); ?> → <?php echo e($s['end_date']); ?></div>
+            </li>
+          <?php endwhile; ?>
+        </ul>
+      </div>
+    <?php endif; ?>
   </div>
 
   <div class="bg-white p-6 rounded shadow mt-8">
-    <h3 class="text-lg font-semibold mb-4">Recent Tasks</h3>
+    <h3 class="text-lg font-semibold mb-4"><?php echo $roleViewAll ? 'Recent Tasks' : 'My and Broadcast Tasks'; ?></h3>
     <div class="overflow-x-auto">
       <table class="min-w-full">
         <thead class="bg-gray-50"><tr>
@@ -83,7 +114,7 @@ $tasks = $conn->query('SELECT t.*, CONCAT(e.first_name, " ", e.last_name) AS ass
             <tr class="border-b">
               <td class="px-4 py-2 text-sm"><?php echo e($t['title']); ?></td>
               <td class="px-4 py-2 text-sm"><?php echo e($t['status']); ?></td>
-              <td class="px-4 py-2 text-sm"><?php echo e($t['assignee'] ?: '-'); ?></td>
+              <td class="px-4 py-2 text-sm"><?php echo e($t['assignee'] ?: 'All Employees'); ?></td>
               <td class="px-4 py-2 text-sm text-gray-500"><?php echo date('Y-m-d H:i', strtotime($t['created_at'])); ?></td>
             </tr>
           <?php endwhile; ?>
