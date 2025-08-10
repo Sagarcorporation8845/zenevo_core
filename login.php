@@ -62,7 +62,7 @@ if (isset($_SESSION['login_error'])) {
                 <label for="email" class="text-sm font-medium text-gray-700">Email address</label>
                 <div class="mt-1">
                     <input id="email" name="email" type="email" autocomplete="email" required
-                           class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                           class="w-full enhanced-input">
                 </div>
             </div>
 
@@ -70,7 +70,7 @@ if (isset($_SESSION['login_error'])) {
                 <label for="password" class="text-sm font-medium text-gray-700">Password</label>
                 <div class="mt-1">
                     <input id="password" name="password" type="password" autocomplete="current-password" required
-                           class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                           class="w-full enhanced-input">
                 </div>
             </div>
 

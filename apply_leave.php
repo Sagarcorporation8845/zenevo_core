@@ -33,13 +33,13 @@ if (isset($_SESSION['flash_message'])) {
 
             <!-- Leave Dates -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <div>
-                    <label for="start_date" class="block text-sm font-medium text-gray-700">Start Date</label>
-                    <input type="date" name="start_date" id="start_date" required class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                <div class="form-group">
+                    <label for="start_date">Start Date</label>
+                    <input type="date" name="start_date" id="start_date" required class="w-full enhanced-input">
                 </div>
-                <div>
-                    <label for="end_date" class="block text-sm font-medium text-gray-700">End Date</label>
-                    <input type="date" name="end_date" id="end_date" required class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                <div class="form-group">
+                    <label for="end_date">End Date</label>
+                    <input type="date" name="end_date" id="end_date" required class="w-full enhanced-input">
                 </div>
             </div>
 

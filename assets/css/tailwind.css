@@ -6,6 +6,73 @@
   .sidebar-link.active {
     @apply bg-indigo-700 text-white;
   }
+  
+  /* Enhanced Input Styles for Better Visibility */
+  .enhanced-input {
+    @apply px-3 py-2 border-2 border-gray-300 rounded-md shadow-sm placeholder-gray-400 
+           focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 
+           transition-all duration-200 ease-in-out;
+    
+    /* Enhanced border visibility on white backgrounds */
+    border-color: #d1d5db !important;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  }
+
+  /* Hover state for better user interaction feedback */
+  .enhanced-input:hover {
+    border-color: #9ca3af !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+
+  /* Focus state with prominent glow effect */
+  .enhanced-input:focus {
+    border-color: #6366f1 !important;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1), 
+                0 4px 6px -1px rgba(0, 0, 0, 0.1), 
+                0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+    transform: translateY(-1px);
+  }
+
+  /* Form group styling for better arrangement */
+  .form-group {
+    @apply mb-4;
+  }
+
+  .form-group label {
+    @apply block text-sm font-medium text-gray-700 mb-1;
+  }
+
+  /* Grid form layout for better arrangement */
+  .form-grid {
+    @apply grid gap-4;
+  }
+
+  .form-grid-2 {
+    @apply grid-cols-1 md:grid-cols-2;
+  }
+
+  .form-grid-3 {
+    @apply grid-cols-1 md:grid-cols-3;
+  }
+
+  /* Table input styling for invoice items */
+  .table-input {
+    @apply px-2 py-2 border-2 border-gray-300 rounded-md shadow-sm 
+           focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 
+           transition-all duration-200 ease-in-out;
+    border-color: #d1d5db !important;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  }
+
+  .table-input:hover {
+    border-color: #9ca3af !important;
+  }
+
+  .table-input:focus {
+    border-color: #6366f1 !important;
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1), 
+                0 2px 4px -1px rgba(0, 0, 0, 0.1) !important;
+  }
 }
 
 @layer utilities {

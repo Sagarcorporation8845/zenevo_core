@@ -41,14 +41,14 @@ if (isset($_SESSION['flash_message'])) {
             <!-- Personal Information Section -->
             <div class="border-b border-gray-200 pb-6 mb-6">
                 <h3 class="text-lg font-medium leading-6 text-gray-900">Personal Details</h3>
-                <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label for="first_name" class="block text-sm font-medium text-gray-700">First Name</label>
-                        <input type="text" name="first_name" id="first_name" required class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                <div class="mt-4 form-grid form-grid-2">
+                    <div class="form-group">
+                        <label for="first_name">First Name</label>
+                        <input type="text" name="first_name" id="first_name" required class="w-full enhanced-input">
                     </div>
-                    <div>
-                        <label for="last_name" class="block text-sm font-medium text-gray-700">Last Name</label>
-                        <input type="text" name="last_name" id="last_name" required class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                    <div class="form-group">
+                        <label for="last_name">Last Name</label>
+                        <input type="text" name="last_name" id="last_name" required class="w-full enhanced-input">
                     </div>
                 </div>
             </div>
@@ -56,18 +56,18 @@ if (isset($_SESSION['flash_message'])) {
             <!-- Job Information Section -->
             <div class="border-b border-gray-200 pb-6 mb-6">
                 <h3 class="text-lg font-medium leading-6 text-gray-900">Job Details</h3>
-                <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label for="designation" class="block text-sm font-medium text-gray-700">Designation</label>
-                        <input type="text" name="designation" id="designation" required class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                <div class="mt-4 form-grid form-grid-3">
+                    <div class="form-group">
+                        <label for="designation">Designation</label>
+                        <input type="text" name="designation" id="designation" required class="w-full enhanced-input">
                     </div>
-                    <div>
-                        <label for="department" class="block text-sm font-medium text-gray-700">Department</label>
-                        <input type="text" name="department" id="department" required class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                    <div class="form-group">
+                        <label for="department">Department</label>
+                        <input type="text" name="department" id="department" required class="w-full enhanced-input">
                     </div>
-                    <div>
-                        <label for="date_of_joining" class="block text-sm font-medium text-gray-700">Date of Joining</label>
-                        <input type="date" name="date_of_joining" id="date_of_joining" required class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                    <div class="form-group">
+                        <label for="date_of_joining">Date of Joining</label>
+                        <input type="date" name="date_of_joining" id="date_of_joining" required class="w-full enhanced-input">
                     </div>
                 </div>
             </div>
@@ -75,19 +75,19 @@ if (isset($_SESSION['flash_message'])) {
             <!-- Account Information Section -->
             <div>
                 <h3 class="text-lg font-medium leading-6 text-gray-900">Account Credentials</h3>
-                <p class="text-sm text-gray-500">The employee will use these to log in.</p>
-                <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div>
-                        <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
-                        <input type="email" name="email" id="email" required class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                <p class="text-sm text-gray-500 mb-4">The employee will use these to log in.</p>
+                <div class="form-grid form-grid-3">
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" name="email" id="email" required class="w-full enhanced-input">
                     </div>
-                    <div>
-                        <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
-                        <input type="password" name="password" id="password" required class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" name="password" id="password" required class="w-full enhanced-input">
                     </div>
-                    <div>
-                        <label for="role_id" class="block text-sm font-medium text-gray-700">Role</label>
-                        <select name="role_id" id="role_id" required class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                    <div class="form-group">
+                        <label for="role_id">Role</label>
+                        <select name="role_id" id="role_id" required class="w-full enhanced-input">
                             <?php
                             // Fetch roles from database with access control
                             $current_user_role = get_user_role($conn, $_SESSION['user_id']);
