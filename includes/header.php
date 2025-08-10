@@ -20,27 +20,9 @@ require_login(); // This function is from db.php
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- The $pageTitle variable should be set on each page before including the header -->
     <title><?php echo isset($pageTitle) ? e($pageTitle) . ' - ' : ''; ?>HR & Finance</title>
-    <script src="[https://cdn.tailwindcss.com](https://cdn.tailwindcss.com)"></script>
-    <link href="[https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap](https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap)" rel="stylesheet">
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-        /* Simple style for active sidebar link */
-        .sidebar-link.active {
-            background-color: #4f46e5; /* indigo-700 */
-            color: white;
-        }
-        /* Hide scrollbar for Chrome, Safari and Opera */
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-        /* Hide scrollbar for IE, Edge and Firefox */
-        .no-scrollbar {
-            -ms-overflow-style: none;  /* IE and Edge */
-            scrollbar-width: none;  /* Firefox */
-        }
-    </style>
+    <link rel="stylesheet" href="<?php echo url_for('assets/css/app.css'); ?>">
 </head>
-<body class="h-full">
+<body class="h-full font-sans">
     <div class="flex h-screen bg-gray-200">
         <?php include 'sidebar.php'; // The sidebar is included within the main layout ?>
         <div class="flex-1 flex flex-col overflow-hidden">
