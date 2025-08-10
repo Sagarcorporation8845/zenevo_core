@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         // Security check
         if (!has_permission($conn, 'manage_employees')) {
             $_SESSION['flash_message'] = ['type' => 'error', 'message' => 'You do not have permission to perform this action.'];
-            header('Location: /employees.php');
+            header('Location: ' . url_for('employees.php'));
             exit();
         }
 
@@ -33,12 +33,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         // --- 2. Server-side Validation ---
         if (empty($first_name) || empty($last_name) || empty($email) || empty($password) || empty($designation) || empty($department) || empty($date_of_joining)) {
             $_SESSION['flash_message'] = ['type' => 'error', 'message' => 'All fields are required.'];
-            header('Location: /add_employee.php');
+            header('Location: ' . url_for('add_employee.php'));
             exit();
         }
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $_SESSION['flash_message'] = ['type' => 'error', 'message' => 'Invalid email format.'];
-            header('Location: /add_employee.php');
+            header('Location: ' . url_for('add_employee.php'));
             exit();
         }
 
@@ -74,13 +74,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             // Commit the transaction
             $conn->commit();
             $_SESSION['flash_message'] = ['type' => 'success', 'message' => 'Employee added successfully!'];
-            header('Location: /employees.php');
+            header('Location: ' . url_for('employees.php'));
             exit();
 
         } catch (Exception $e) {
             $conn->rollback();
             $_SESSION['flash_message'] = ['type' => 'error', 'message' => 'Failed to add employee: ' . $e->getMessage()];
-            header('Location: /add_employee.php');
+            header('Location: ' . url_for('add_employee.php'));
             exit();
         }
     }
@@ -90,7 +90,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         // Security check
         if (!has_permission($conn, 'manage_employees')) {
             $_SESSION['flash_message'] = ['type' => 'error', 'message' => 'You do not have permission to perform this action.'];
-            header('Location: /employees.php');
+            header('Location: ' . url_for('employees.php'));
             exit();
         }
 
@@ -112,13 +112,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $_SESSION['flash_message'] = ['type' => 'error', 'message' => 'Failed to update employee status.'];
         }
         $stmt->close();
-        header('Location: /employees.php');
+        header('Location: ' . url_for('employees.php'));
         exit();
     }
 
 } else {
     // If accessed directly or without a POST method
-    header('Location: /dashboard.php');
+    header('Location: ' . url_for('dashboard.php'));
     exit();
 }
 ?>

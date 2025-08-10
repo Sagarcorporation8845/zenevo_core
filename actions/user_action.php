@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
         if (empty($name)) {
             $_SESSION['flash_message'] = ['type' => 'error', 'message' => 'Name cannot be empty.'];
-            header('Location: /profile.php');
+            header('Location: ' . url_for('profile.php'));
             exit();
         }
 
@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $_SESSION['flash_message'] = ['type' => 'error', 'message' => 'Failed to update profile.'];
         }
         $stmt->close();
-        header('Location: /profile.php');
+        header('Location: ' . url_for('profile.php'));
         exit();
     }
 
@@ -50,12 +50,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         // 1. Validation
         if (empty($current_password) || empty($new_password) || empty($confirm_password)) {
             $_SESSION['flash_message'] = ['type' => 'error', 'message' => 'All password fields are required.', 'form' => 'password'];
-            header('Location: /profile.php');
+            header('Location: ' . url_for('profile.php'));
             exit();
         }
         if ($new_password !== $confirm_password) {
             $_SESSION['flash_message'] = ['type' => 'error', 'message' => 'New password and confirmation do not match.', 'form' => 'password'];
-            header('Location: /profile.php');
+            header('Location: ' . url_for('profile.php'));
             exit();
         }
 
@@ -82,11 +82,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             // Current password was incorrect
             $_SESSION['flash_message'] = ['type' => 'error', 'message' => 'Incorrect current password.', 'form' => 'password'];
         }
-        header('Location: /profile.php');
+        header('Location: ' . url_for('profile.php'));
         exit();
     }
 } else {
-    header('Location: /dashboard.php');
+    header('Location: ' . url_for('dashboard.php'));
     exit();
 }
 ?>

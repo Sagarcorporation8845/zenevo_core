@@ -11,7 +11,7 @@ require_once 'config/db.php';
 
 // If a user is already logged in, redirect them to the dashboard.
 if (isset($_SESSION['user_id'])) {
-    header('Location: dashboard.php');
+    header('Location: ' . url_for('dashboard.php'));
     exit();
 }
 

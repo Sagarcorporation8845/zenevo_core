@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
         if (empty($start_date) || empty($end_date) || empty($reason)) {
             $_SESSION['flash_message'] = ['type' => 'error', 'message' => 'All fields are required.'];
-            header('Location: /apply_leave.php');
+            header('Location: ' . url_for('apply_leave.php'));
             exit();
         }
 
@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         $result_emp = $stmt_emp->get_result();
         if ($result_emp->num_rows === 0) {
             $_SESSION['flash_message'] = ['type' => 'error', 'message' => 'Could not find employee record for your user account.'];
-            header('Location: /apply_leave.php');
+            header('Location: ' . url_for('apply_leave.php'));
             exit();
         }
         $employee = $result_emp->fetch_assoc();
@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $_SESSION['flash_message'] = ['type' => 'error', 'message' => 'Failed to submit leave request. Please try again.'];
         }
         $stmt->close();
-        header('Location: /leaves.php');
+        header('Location: ' . url_for('leaves.php'));
         exit();
     }
 
@@ -59,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         // Security check
         if (!has_permission($conn, 'manage_leaves')) {
             $_SESSION['flash_message'] = ['type' => 'error', 'message' => 'You do not have permission to perform this action.'];
-            header('Location: /leaves.php');
+            header('Location: ' . url_for('leaves.php'));
             exit();
         }
 
@@ -68,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
         if (empty($leave_id) || !in_array($new_status, ['Approved', 'Rejected'])) {
             $_SESSION['flash_message'] = ['type' => 'error', 'message' => 'Invalid request.'];
-            header('Location: /leaves.php');
+            header('Location: ' . url_for('leaves.php'));
             exit();
         }
 
@@ -82,11 +82,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $_SESSION['flash_message'] = ['type' => 'error', 'message' => 'Failed to update leave status.'];
         }
         $stmt->close();
-        header('Location: /leaves.php');
+        header('Location: ' . url_for('leaves.php'));
         exit();
     }
 } else {
-    header('Location: /dashboard.php');
+    header('Location: ' . url_for('dashboard.php'));
     exit();
 }
 ?>

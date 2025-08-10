@@ -17,7 +17,8 @@ $_SESSION = array();
 // Destroy the session
 session_destroy();
 
+require_once __DIR__ . '/config/db.php';
 // Redirect to the login page
-header("Location: /login.php");
+header("Location: " . url_for('login.php'));
 exit();
 ?>
