@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         // Security check
         if (!has_permission($conn, 'manage_documents')) {
             $_SESSION['flash_message'] = ['type' => 'error', 'message' => 'You do not have permission to perform this action.'];
-            header('Location: /documents.php');
+            header('Location: ' . url_for('documents.php'));
             exit();
         }
 
@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
         if (empty($name) || empty($type) || empty($content)) {
             $_SESSION['flash_message'] = ['type' => 'error', 'message' => 'All fields are required.'];
-            header('Location: /create_document_template.php' . ($template_id ? '?id=' . $template_id : ''));
+            header('Location: ' . url_for('create_document_template.php') . ($template_id ? '?id=' . $template_id : ''));
             exit();
         }
 
@@ -50,10 +50,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         // 3. Execute the query
         if ($stmt->execute()) {
             $_SESSION['flash_message'] = ['type' => 'success', 'message' => $message];
-            header('Location: /documents.php');
+            header('Location: ' . url_for('documents.php'));
         } else {
             $_SESSION['flash_message'] = ['type' => 'error', 'message' => 'Failed to save template.'];
-            header('Location: /create_document_template.php' . ($template_id ? '?id=' . $template_id : ''));
+            header('Location: ' . url_for('create_document_template.php') . ($template_id ? '?id=' . $template_id : ''));
         }
         $stmt->close();
         exit();
@@ -143,7 +143,7 @@ HTML;
     }
 
 } else {
-    header('Location: /dashboard.php');
+    header('Location: ' . url_for('dashboard.php'));
     exit();
 }
 ?>

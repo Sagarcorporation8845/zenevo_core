@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         // Security check
         if (!has_permission($conn, 'manage_invoices')) {
             $_SESSION['flash_message'] = ['type' => 'error', 'message' => 'You do not have permission to create invoices.'];
-            header('Location: /invoices.php');
+            header('Location: ' . url_for('invoices.php'));
             exit();
         }
 
@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
         if (empty($invoice_items)) {
             $_SESSION['flash_message'] = ['type' => 'error', 'message' => 'Cannot create an empty invoice. Please add at least one item.'];
-            header('Location: /create_invoice.php');
+            header('Location: ' . url_for('create_invoice.php'));
             exit();
         }
 
@@ -81,7 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             // If all queries were successful, commit the transaction
             $conn->commit();
             $_SESSION['flash_message'] = ['type' => 'success', 'message' => 'Invoice created successfully!'];
-            header('Location: /invoices.php');
+            header('Location: ' . url_for('invoices.php'));
             exit();
 
         } catch (mysqli_sql_exception $exception) {
@@ -89,12 +89,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $conn->rollback();
             error_log("Invoice creation failed: " . $exception->getMessage());
             $_SESSION['flash_message'] = ['type' => 'error', 'message' => 'Failed to create invoice. Please try again.'];
-            header('Location: /create_invoice.php');
+            header('Location: ' . url_for('create_invoice.php'));
             exit();
         }
     }
 } else {
-    header('Location: /dashboard.php');
+    header('Location: ' . url_for('dashboard.php'));
     exit();
 }
 ?>

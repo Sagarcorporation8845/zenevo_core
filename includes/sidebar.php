@@ -13,40 +13,40 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
         <h2 class="text-2xl font-bold">Company Inc.</h2>
     </div>
     <nav class="flex-1 px-2 py-4 space-y-2">
-        <a href="/dashboard.php" class="sidebar-link flex items-center px-4 py-2.5 rounded-md hover:bg-gray-700 <?php echo ($current_page == 'dashboard.php') ? 'active' : ''; ?>">
+        <a href="<?php echo url_for('dashboard.php'); ?>" class="sidebar-link flex items-center px-4 py-2.5 rounded-md hover:bg-gray-700 <?php echo ($current_page == 'dashboard.php') ? 'active' : ''; ?>">
             Dashboard
         </a>
 
-        <a href="/profile.php" class="sidebar-link flex items-center px-4 py-2.5 rounded-md hover:bg-gray-700 <?php echo ($current_page == 'profile.php') ? 'active' : ''; ?>">
+        <a href="<?php echo url_for('profile.php'); ?>" class="sidebar-link flex items-center px-4 py-2.5 rounded-md hover:bg-gray-700 <?php echo ($current_page == 'profile.php') ? 'active' : ''; ?>">
             My Profile
         </a>
 
         <?php if (has_permission($conn, 'manage_employees')): ?>
-            <a href="/employees.php" class="sidebar-link flex items-center px-4 py-2.5 rounded-md hover:bg-gray-700 <?php echo in_array($current_page, ['employees.php', 'add_employee.php']) ? 'active' : ''; ?>">
+            <a href="<?php echo url_for('employees.php'); ?>" class="sidebar-link flex items-center px-4 py-2.5 rounded-md hover:bg-gray-700 <?php echo in_array($current_page, ['employees.php', 'add_employee.php']) ? 'active' : ''; ?>">
                 Employee Management
             </a>
         <?php endif; ?>
 
         <?php if (has_permission($conn, 'manage_leaves') || $_SESSION['role_id'] == 4): // Show to managers or employees ?>
-            <a href="/leaves.php" class="sidebar-link flex items-center px-4 py-2.5 rounded-md hover:bg-gray-700 <?php echo in_array($current_page, ['leaves.php', 'apply_leave.php']) ? 'active' : ''; ?>">
+            <a href="<?php echo url_for('leaves.php'); ?>" class="sidebar-link flex items-center px-4 py-2.5 rounded-md hover:bg-gray-700 <?php echo in_array($current_page, ['leaves.php', 'apply_leave.php']) ? 'active' : ''; ?>">
                 Leave Management
             </a>
         <?php endif; ?>
 
         <?php if (has_permission($conn, 'manage_invoices')): ?>
-            <a href="/invoices.php" class="sidebar-link flex items-center px-4 py-2.5 rounded-md hover:bg-gray-700 <?php echo in_array($current_page, ['invoices.php', 'create_invoice.php']) ? 'active' : ''; ?>">
+            <a href="<?php echo url_for('invoices.php'); ?>" class="sidebar-link flex items-center px-4 py-2.5 rounded-md hover:bg-gray-700 <?php echo in_array($current_page, ['invoices.php', 'create_invoice.php']) ? 'active' : ''; ?>">
                 Finance & Invoices
             </a>
         <?php endif; ?>
 
         <?php if (has_permission($conn, 'manage_documents')): ?>
-            <a href="/documents.php" class="sidebar-link flex items-center px-4 py-2.5 rounded-md hover:bg-gray-700 <?php echo in_array($current_page, ['documents.php', 'create_document_template.php', 'generate_document.php']) ? 'active' : ''; ?>">
+            <a href="<?php echo url_for('documents.php'); ?>" class="sidebar-link flex items-center px-4 py-2.5 rounded-md hover:bg-gray-700 <?php echo in_array($current_page, ['documents.php', 'create_document_template.php', 'generate_document.php']) ? 'active' : ''; ?>">
                 Documents
             </a>
         <?php endif; ?>
 
         <?php if (has_permission($conn, 'view_reports')): ?>
-            <a href="/reports.php" class="sidebar-link flex items-center px-4 py-2.5 rounded-md hover:bg-gray-700 <?php echo ($current_page == 'reports.php') ? 'active' : ''; ?>">
+            <a href="<?php echo url_for('reports.php'); ?>" class="sidebar-link flex items-center px-4 py-2.5 rounded-md hover:bg-gray-700 <?php echo ($current_page == 'reports.php') ? 'active' : ''; ?>">
                 Reports
             </a>
         <?php endif; ?>

@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         // Basic validation
         if (empty($email) || empty($password)) {
             $_SESSION['login_error'] = 'Email and password are required.';
-            header('Location: /login.php');
+            header('Location: ' . url_for('login.php'));
             exit();
         }
 
@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 // Check if the user account is active
                 if (!$user['is_active']) {
                     $_SESSION['login_error'] = 'Your account is deactivated. Please contact an administrator.';
-                    header('Location: /login.php');
+                    header('Location: ' . url_for('login.php'));
                     exit();
                 }
 
@@ -53,26 +53,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 $_SESSION['role_id'] = $user['role_id'];
 
                 // 5. Redirect to the dashboard
-                header('Location: /dashboard.php');
+                header('Location: ' . url_for('dashboard.php'));
                 exit();
 
             } else {
                 // Password was incorrect
                 $_SESSION['login_error'] = 'Invalid email or password.';
-                header('Location: /login.php');
+                header('Location: ' . url_for('login.php'));
                 exit();
             }
         } else {
             // No user found with that email
             $_SESSION['login_error'] = 'Invalid email or password.';
-            header('Location: /login.php');
+            header('Location: ' . url_for('login.php'));
             exit();
         }
         $stmt->close();
     }
 } else {
     // If someone tries to access this file directly, redirect them.
-    header('Location: /login.php');
+    header('Location: ' . url_for('login.php'));
     exit();
 }
 ?>

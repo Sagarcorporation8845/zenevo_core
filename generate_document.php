@@ -18,7 +18,7 @@ if (!has_permission($conn, 'manage_documents')) {
 
 // Get template ID from URL
 if (!isset($_GET['template_id'])) {
-    header('Location: /documents.php');
+    header('Location: ' . url_for('documents.php'));
     exit();
 }
 $template_id = $_GET['template_id'];
@@ -65,7 +65,7 @@ $employees_result = $conn->query("SELECT e.id, e.first_name, e.last_name FROM em
             <!-- Form Actions -->
             <div class="pt-5 border-t border-gray-200">
                 <div class="flex justify-end">
-                    <a href="documents.php" class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50">Cancel</a>
+                    <a href="<?php echo url_for('documents.php'); ?>" class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50">Cancel</a>
                     <button type="submit" class="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700">
                         Generate & Preview
                     </button>

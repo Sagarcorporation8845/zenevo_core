@@ -50,7 +50,7 @@ require_login(); // This function is from db.php
                 </div>
                 <div class="flex items-center space-x-4">
                     <span class="text-sm font-medium text-gray-600">Welcome, <?php echo e($_SESSION['user_name']); ?></span>
-                    <a href="/logout.php" class="text-sm font-medium text-indigo-600 hover:text-indigo-800">Logout</a>
+                    <a href="<?php echo url_for('logout.php'); ?>" class="text-sm font-medium text-indigo-600 hover:text-indigo-800">Logout</a>
                 </div>
             </header>
             <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6">

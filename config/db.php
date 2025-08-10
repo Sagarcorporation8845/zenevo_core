@@ -26,12 +26,48 @@ if ($conn->connect_error) {
 // --- Helper Functions ---
 
 /**
+ * Returns the base URL path where the app is hosted (e.g., "/core" or "").
+ * Computed from the filesystem paths of DOCUMENT_ROOT and the app root.
+ */
+function base_url_path() {
+    static $cachedBasePath = null;
+    if ($cachedBasePath !== null) {
+        return $cachedBasePath;
+    }
+
+    $documentRoot = isset($_SERVER['DOCUMENT_ROOT']) ? realpath($_SERVER['DOCUMENT_ROOT']) : '';
+    $documentRoot = $documentRoot ? rtrim(str_replace('\\', '/', $documentRoot), '/') : '';
+
+    // App root is one level up from this file: /config -> app root
+    $appRoot = realpath(__DIR__ . '/..');
+    $appRoot = $appRoot ? rtrim(str_replace('\\', '/', $appRoot), '/') : '';
+
+    $base = '';
+    if ($documentRoot && $appRoot && strpos($appRoot, $documentRoot) === 0) {
+        $base = substr($appRoot, strlen($documentRoot));
+    }
+
+    $base = '/' . ltrim($base, '/');
+    $cachedBasePath = rtrim($base, '/');
+    return $cachedBasePath;
+}
+
+/**
+ * Prefixes a relative path with the app's base URL path.
+ * Example: url_for('dashboard.php') -> '/core/dashboard.php' if app is under /core
+ */
+function url_for($path) {
+    $base = base_url_path();
+    return ($base ? $base : '') . '/' . ltrim($path, '/');
+}
+
+/**
  * Checks if a user is logged in.
  * If not, redirects to the login page.
  */
 function require_login() {
     if (!isset($_SESSION['user_id'])) {
-        header("Location: /login.php");
+        header("Location: " . url_for('login.php'));
         exit();
     }
 }
