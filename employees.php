@@ -115,7 +115,7 @@ $result = $conn->query($sql);
                                 </td>
                                 <td class="px-5 py-4 border-b border-gray-200 bg-white text-sm text-center">
                                     <div class="flex item-center justify-center space-x-2">
-                                        <a href="#" class="text-indigo-600 hover:text-indigo-900">Edit</a>
+                                        <a href="edit_employee.php?id=<?php echo e($row['id']); ?>" class="text-indigo-600 hover:text-indigo-900">Edit</a>
                                         <form action="actions/employee_action.php" method="POST" onsubmit="return confirm('Are you sure you want to change this employee\'s status?');">
                                             <input type="hidden" name="action" value="toggle_status">
                                             <input type="hidden" name="user_id" value="<?php echo e($row['user_id']); ?>">

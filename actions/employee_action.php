@@ -109,6 +109,76 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         }
     }
 
+    // --- Update Employee Action ---
+    if ($_POST['action'] === 'update_employee') {
+        if (!has_permission($conn, 'manage_employees')) {
+            $_SESSION['flash_message'] = ['type' => 'error', 'message' => 'You do not have permission to perform this action.'];
+            header('Location: ' . url_for('employees.php'));
+            exit();
+        }
+
+        $employee_id = (int)$_POST['employee_id'];
+        $user_id = (int)$_POST['user_id'];
+        $first_name = trim($_POST['first_name']);
+        $last_name = trim($_POST['last_name']);
+        $designation = trim($_POST['designation']);
+        $department = trim($_POST['department']);
+        $date_of_joining = $_POST['date_of_joining'];
+        $email = trim($_POST['email']);
+        $role_id = isset($_POST['role_id']) ? (int)$_POST['role_id'] : null;
+
+        if (!$employee_id || !$user_id || !$first_name || !$last_name || !$designation || !$department || !$date_of_joining || !$email || !$role_id) {
+            $_SESSION['flash_message'] = ['type' => 'error', 'message' => 'All fields are required.'];
+            header('Location: ' . url_for('edit_employee.php?id=' . $employee_id));
+            exit();
+        }
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $_SESSION['flash_message'] = ['type' => 'error', 'message' => 'Invalid email format.'];
+            header('Location: ' . url_for('edit_employee.php?id=' . $employee_id));
+            exit();
+        }
+        if (!is_valid_role($conn, $role_id)) {
+            $_SESSION['flash_message'] = ['type' => 'error', 'message' => 'Invalid role selected.'];
+            header('Location: ' . url_for('edit_employee.php?id=' . $employee_id));
+            exit();
+        }
+
+        // Only Admin can assign Admin/HR roles
+        $current_user_role = get_user_role($conn, $_SESSION['user_id']);
+        if ($role_id <= 2 && $current_user_role['role_name'] !== 'Admin') {
+            $_SESSION['flash_message'] = ['type' => 'error', 'message' => 'You do not have permission to assign this role.'];
+            header('Location: ' . url_for('edit_employee.php?id=' . $employee_id));
+            exit();
+        }
+
+        $conn->begin_transaction();
+        try {
+            // Update users email/name/role
+            $full_name = $first_name . ' ' . $last_name;
+            $stmt_user = $conn->prepare("UPDATE users SET name = ?, email = ?, role_id = ? WHERE id = ?");
+            $stmt_user->bind_param("ssii", $full_name, $email, $role_id, $user_id);
+            $stmt_user->execute();
+            $stmt_user->close();
+
+            // Update employee details
+            $stmt_emp = $conn->prepare("UPDATE employees SET first_name = ?, last_name = ?, designation = ?, department = ?, date_of_joining = ? WHERE id = ?");
+            $stmt_emp->bind_param("sssssi", $first_name, $last_name, $designation, $department, $date_of_joining, $employee_id);
+            $stmt_emp->execute();
+            $stmt_emp->close();
+
+            $conn->commit();
+            audit_log($conn, 'employee_updated', "Employee ID: $employee_id updated", 'employee_management');
+            $_SESSION['flash_message'] = ['type' => 'success', 'message' => 'Employee updated successfully.'];
+            header('Location: ' . url_for('employees.php'));
+            exit();
+        } catch (Exception $e) {
+            $conn->rollback();
+            $_SESSION['flash_message'] = ['type' => 'error', 'message' => 'Failed to update employee.'];
+            header('Location: ' . url_for('edit_employee.php?id=' . $employee_id));
+            exit();
+        }
+    }
+
     // --- Toggle Employee Status Action ---
     if ($_POST['action'] === 'toggle_status') {
         // Security check

@@ -45,6 +45,12 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
             </a>
         <?php endif; ?>
 
+        <?php if (has_permission($conn, 'manage_employees')): ?>
+            <a href="<?php echo url_for('attendance_settings.php'); ?>" class="sidebar-link flex items-center px-4 py-2.5 rounded-md hover:bg-gray-700 <?php echo ($current_page == 'attendance_settings.php') ? 'active' : ''; ?>">
+                Attendance Settings
+            </a>
+        <?php endif; ?>
+
         <?php if (has_permission($conn, 'view_reports')): ?>
             <a href="<?php echo url_for('reports.php'); ?>" class="sidebar-link flex items-center px-4 py-2.5 rounded-md hover:bg-gray-700 <?php echo ($current_page == 'reports.php') ? 'active' : ''; ?>">
                 Reports
