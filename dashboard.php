@@ -20,6 +20,32 @@ include 'includes/header.php';
 
     <h2 class="text-2xl font-semibold text-gray-800 mb-6">Welcome to your Dashboard</h2>
 
+    <?php
+    // Finance widgets visibility: Admins or users with manage_invoices permission
+    $can_view_finance = has_permission($conn, 'manage_invoices') || check_role_access($conn, ['Admin','Finance']);
+    $revenue_this_month = 0.0;
+    $overdue_count = 0;
+    if ($can_view_finance) {
+        $startOfMonth = date('Y-m-01');
+        $endOfMonth = date('Y-m-t');
+        // Revenue: sum of PAID invoices in current month (Zoho-like logic approximation)
+        if ($stmt = $conn->prepare("SELECT COALESCE(SUM(total_amount),0) FROM invoices WHERE status IN ('Paid') AND issue_date BETWEEN ? AND ?")) {
+            $stmt->bind_param('ss', $startOfMonth, $endOfMonth);
+            $stmt->execute();
+            $stmt->bind_result($revenue_this_month);
+            $stmt->fetch();
+            $stmt->close();
+        }
+        // Overdue: invoices past due and not paid/cancelled/void
+        if ($stmt = $conn->prepare("SELECT COUNT(*) FROM invoices WHERE due_date < CURDATE() AND status NOT IN ('Paid','Cancelled','Void')")) {
+            $stmt->execute();
+            $stmt->bind_result($overdue_count);
+            $stmt->fetch();
+            $stmt->close();
+        }
+    }
+    ?>
+
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <!-- Example Dashboard Card 1 -->
         <div class="bg-white p-6 rounded-lg shadow-md">
@@ -42,19 +68,21 @@ include 'includes/header.php';
             <p class="text-3xl font-bold text-orange-600 mt-2"><?php echo e($count); ?></p>
         </div>
 
-        <!-- Example Dashboard Card 3 -->
+        <?php if ($can_view_finance): ?>
+        <!-- Revenue this Month (Finance/Admin only) -->
         <div class="bg-white p-6 rounded-lg shadow-md">
             <h3 class="text-lg font-semibold text-gray-700">Revenue this Month</h3>
-            <p class="text-3xl font-bold text-green-600 mt-2">$0.00</p>
-            <p class="text-xs text-gray-500">Logic to be implemented</p>
+            <p class="text-3xl font-bold text-green-600 mt-2">₹<?php echo number_format((float)$revenue_this_month, 2); ?></p>
+            <p class="text-xs text-gray-500">Sum of paid invoices this month</p>
         </div>
 
-        <!-- Example Dashboard Card 4 -->
+        <!-- Overdue Invoices (Finance/Admin only) -->
         <div class="bg-white p-6 rounded-lg shadow-md">
             <h3 class="text-lg font-semibold text-gray-700">Overdue Invoices</h3>
-            <p class="text-3xl font-bold text-red-600 mt-2">0</p>
-            <p class="text-xs text-gray-500">Logic to be implemented</p>
+            <p class="text-3xl font-bold text-red-600 mt-2"><?php echo (int)$overdue_count; ?></p>
+            <p class="text-xs text-gray-500">Due date passed and unpaid</p>
         </div>
+        <?php endif; ?>
     </div>
 
     <!-- More dashboard widgets can be added here -->

@@ -16,11 +16,15 @@ if (isset($_SESSION['user_id'])) {
 }
 
 $error_message = '';
+$success_message = '';
 // Check if there's a login error message in the session.
 if (isset($_SESSION['login_error'])) {
     $error_message = $_SESSION['login_error'];
-    // Unset the error message so it doesn't show again on refresh.
     unset($_SESSION['login_error']);
+}
+if (isset($_SESSION['login_success'])) {
+    $success_message = $_SESSION['login_success'];
+    unset($_SESSION['login_success']);
 }
 ?>
 <!DOCTYPE html>
@@ -47,7 +51,12 @@ if (isset($_SESSION['login_error'])) {
             </p>
         </div>
 
-        <!-- Display login error message if it exists -->
+        <!-- Display login messages -->
+        <?php if ($success_message): ?>
+            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg relative" role="alert">
+                <span class="block sm:inline"><?php echo e($success_message); ?></span>
+            </div>
+        <?php endif; ?>
         <?php if ($error_message): ?>
             <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative" role="alert">
                 <span class="block sm:inline"><?php echo e($error_message); ?></span>
@@ -80,8 +89,11 @@ if (isset($_SESSION['login_error'])) {
                     Sign in
                 </button>
             </div>
+                    <div class="flex items-center justify-between">
+                <a href="<?php echo url_for('forgot_password.php'); ?>" class="text-indigo-600 hover:text-indigo-800 text-sm">Forgot password?</a>
+            </div>
         </form>
     </div>
-
-</body>
-</html>
+ 
+ </body>
+ </html>

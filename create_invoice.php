@@ -78,15 +78,15 @@ $projects_result = $conn->query("SELECT p.id, p.name as project_name, c.name as 
                 <div class="w-full max-w-sm">
                     <div class="flex justify-between py-2 border-b">
                         <span class="font-medium text-gray-600">Subtotal</span>
-                        <span id="subtotal" class="font-bold text-gray-800">$0.00</span>
+                        <span id="subtotal" class="font-bold text-gray-800">₹0.00</span>
                     </div>
                     <div class="flex justify-between py-2 border-b">
                         <span class="font-medium text-gray-600">Tax (0%)</span>
-                        <span id="tax" class="font-bold text-gray-800">$0.00</span>
+                        <span id="tax" class="font-bold text-gray-800">₹0.00</span>
                     </div>
                     <div class="flex justify-between py-4 bg-gray-50 -mx-4 px-4 rounded-b-lg">
                         <span class="font-bold text-lg text-gray-900">Total</span>
-                        <span id="grand-total" class="font-bold text-lg text-indigo-600">$0.00</span>
+                        <span id="grand-total" class="font-bold text-lg text-indigo-600">₹0.00</span>
                     </div>
                 </div>
             </div>
@@ -116,7 +116,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <td class="px-4 py-2 border-b"><input type="text" name="descriptions[]" class="w-full table-input" placeholder="Item description" required></td>
             <td class="px-4 py-2 border-b"><input type="number" name="quantities[]" class="w-24 table-input item-qty" placeholder="1" value="1" min="1" required></td>
             <td class="px-4 py-2 border-b"><input type="number" name="unit_prices[]" class="w-32 table-input item-price" placeholder="0.00" step="0.01" min="0" required></td>
-            <td class="px-4 py-2 border-b text-right"><span class="item-total font-semibold">$0.00</span></td>
+            <td class="px-4 py-2 border-b text-right"><span class="item-total font-semibold">₹0.00</span></td>
             <td class="px-4 py-2 border-b text-center"><button type="button" class="text-red-500 hover:text-red-700 remove-item-btn font-bold">X</button></td>
         `;
         itemsBody.appendChild(row);
@@ -143,7 +143,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const qty = parseFloat(row.querySelector('.item-qty').value) || 0;
             const price = parseFloat(row.querySelector('.item-price').value) || 0;
             const total = qty * price;
-            row.querySelector('.item-total').textContent = '$' + total.toFixed(2);
+            row.querySelector('.item-total').textContent = '₹' + total.toFixed(2);
             updateTotals();
         }
     });
@@ -161,9 +161,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const tax = 0;
         const grandTotal = subtotal + tax;
 
-        document.getElementById('subtotal').textContent = '$' + subtotal.toFixed(2);
-        document.getElementById('tax').textContent = '$' + tax.toFixed(2);
-        document.getElementById('grand-total').textContent = '$' + grandTotal.toFixed(2);
+        document.getElementById('subtotal').textContent = '₹' + subtotal.toFixed(2);
+        document.getElementById('tax').textContent = '₹' + tax.toFixed(2);
+        document.getElementById('grand-total').textContent = '₹' + grandTotal.toFixed(2);
     }
 });
 </script>
