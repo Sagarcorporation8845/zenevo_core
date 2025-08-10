@@ -76,7 +76,7 @@ if (isset($_SESSION['flash_message'])) {
             <div>
                 <h3 class="text-lg font-medium leading-6 text-gray-900">Account Credentials</h3>
                 <p class="text-sm text-gray-500">The employee will use these to log in.</p>
-                <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div>
                         <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
                         <input type="email" name="email" id="email" required class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
@@ -84,6 +84,32 @@ if (isset($_SESSION['flash_message'])) {
                     <div>
                         <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
                         <input type="password" name="password" id="password" required class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                    </div>
+                    <div>
+                        <label for="role_id" class="block text-sm font-medium text-gray-700">Role</label>
+                        <select name="role_id" id="role_id" required class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                            <?php
+                            // Fetch roles from database with access control
+                            $current_user_role = get_user_role($conn, $_SESSION['user_id']);
+                            $roles_sql = "SELECT id, name FROM roles ORDER BY name";
+                            $roles_result = $conn->query($roles_sql);
+                            while($role = $roles_result->fetch_assoc()):
+                                // Only Admin can assign Admin/HR Manager roles
+                                $can_assign = true;
+                                if (($role['id'] <= 2) && $current_user_role['role_name'] !== 'Admin') {
+                                    $can_assign = false;
+                                }
+                                if ($can_assign):
+                            ?>
+                                <option value="<?php echo e($role['id']); ?>" <?php echo ($role['id'] == 4) ? 'selected' : ''; ?>>
+                                    <?php echo e($role['name']); ?>
+                                </option>
+                            <?php 
+                                endif;
+                            endwhile; 
+                            ?>
+                        </select>
+                        <p class="mt-1 text-xs text-gray-500">Default role is Employee. Only Admin can assign Admin/HR Manager roles.</p>
                     </div>
                 </div>
             </div>

@@ -51,6 +51,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['user_name'] = $user['name'];
                 $_SESSION['role_id'] = $user['role_id'];
+                $_SESSION['last_activity'] = time(); // For session timeout
+
+                // Audit log successful login (CIA - Availability)
+                audit_log($conn, 'login_success', "User: {$user['name']} (ID: {$user['id']})", 'authentication');
 
                 // 5. Redirect to the dashboard
                 header('Location: ' . url_for('dashboard.php'));
@@ -58,12 +62,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
             } else {
                 // Password was incorrect
+                audit_log($conn, 'login_failed', "Invalid password for email: $email", 'authentication');
                 $_SESSION['login_error'] = 'Invalid email or password.';
                 header('Location: ' . url_for('login.php'));
                 exit();
             }
         } else {
             // No user found with that email
+            audit_log($conn, 'login_failed', "Invalid email attempted: $email", 'authentication');
             $_SESSION['login_error'] = 'Invalid email or password.';
             header('Location: ' . url_for('login.php'));
             exit();

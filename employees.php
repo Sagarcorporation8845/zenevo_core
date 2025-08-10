@@ -23,12 +23,13 @@ if (isset($_SESSION['flash_message'])) {
     unset($_SESSION['flash_message']);
 }
 
-// Fetch all employees with their user status and user ID
+// Fetch all employees with their user status, user ID, and role information
 $sql = "SELECT 
             e.id, e.first_name, e.last_name, e.designation, e.department, e.date_of_joining, 
-            u.id as user_id, u.email, u.is_active
+            u.id as user_id, u.email, u.is_active, r.name as role_name
         FROM employees e
         JOIN users u ON e.user_id = u.id
+        JOIN roles r ON u.role_id = r.id
         ORDER BY e.first_name, e.last_name";
 $result = $conn->query($sql);
 
@@ -61,6 +62,7 @@ $result = $conn->query($sql);
                     <tr>
                         <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Name</th>
                         <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Designation</th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Role</th>
                         <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Date Joined</th>
                         <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
                         <th class="px-5 py-3 border-b-2 border-gray-200 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
@@ -87,6 +89,19 @@ $result = $conn->query($sql);
                                 <td class="px-5 py-4 border-b border-gray-200 bg-white text-sm">
                                     <p class="text-gray-900 whitespace-no-wrap"><?php echo e($row['designation']); ?></p>
                                     <p class="text-gray-600 whitespace-no-wrap text-xs"><?php echo e($row['department']); ?></p>
+                                </td>
+                                <td class="px-5 py-4 border-b border-gray-200 bg-white text-sm">
+                                    <span class="px-2 py-1 text-xs font-semibold rounded-full
+                                        <?php 
+                                        switch($row['role_name']) {
+                                            case 'Admin': echo 'bg-red-100 text-red-800'; break;
+                                            case 'HR Manager': echo 'bg-blue-100 text-blue-800'; break;
+                                            case 'Finance Manager': echo 'bg-green-100 text-green-800'; break;
+                                            default: echo 'bg-gray-100 text-gray-800'; break;
+                                        }
+                                        ?>">
+                                        <?php echo e($row['role_name']); ?>
+                                    </span>
                                 </td>
                                 <td class="px-5 py-4 border-b border-gray-200 bg-white text-sm">
                                     <p class="text-gray-900 whitespace-no-wrap"><?php echo date('M d, Y', strtotime(e($row['date_of_joining']))); ?></p>
@@ -117,7 +132,7 @@ $result = $conn->query($sql);
                         <?php endwhile; ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="5" class="text-center py-10 text-gray-500">
+                            <td colspan="6" class="text-center py-10 text-gray-500">
                                 No employees found. <a href="add_employee.php" class="text-indigo-600 hover:underline">Add one now</a>.
                             </td>
                         </tr>

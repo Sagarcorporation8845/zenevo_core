@@ -28,13 +28,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         $designation = trim($_POST['designation']);
         $department = trim($_POST['department']);
         $date_of_joining = $_POST['date_of_joining'];
-        $role_id = 4; // Default role for new employees is 'Employee'
+        $role_id = isset($_POST['role_id']) ? (int)$_POST['role_id'] : 4; // Default role for new employees is 'Employee'
 
         // --- 2. Server-side Validation ---
         if (empty($first_name) || empty($last_name) || empty($email) || empty($password) || empty($designation) || empty($department) || empty($date_of_joining)) {
             $_SESSION['flash_message'] = ['type' => 'error', 'message' => 'All fields are required.'];
             header('Location: ' . url_for('add_employee.php'));
             exit();
+        }
+        
+        // Validate role ID (CIA - Integrity)
+        if (!is_valid_role($conn, $role_id)) {
+            $_SESSION['flash_message'] = ['type' => 'error', 'message' => 'Invalid role selected.'];
+            audit_log($conn, 'invalid_role_attempt', "Attempted to assign invalid role: $role_id", 'employee_creation');
+            header('Location: ' . url_for('add_employee.php'));
+            exit();
+        }
+        
+        // Additional role assignment security check
+        $current_user_role = get_user_role($conn, $_SESSION['user_id']);
+        if ($current_user_role && $role_id <= 2) { // Admin or HR Manager roles
+            // Only Admin can assign Admin/HR Manager roles
+            if ($current_user_role['role_name'] !== 'Admin') {
+                $_SESSION['flash_message'] = ['type' => 'error', 'message' => 'You do not have permission to assign this role.'];
+                audit_log($conn, 'unauthorized_role_assignment', "Attempted to assign role ID: $role_id", 'employee_creation');
+                header('Location: ' . url_for('add_employee.php'));
+                exit();
+            }
         }
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $_SESSION['flash_message'] = ['type' => 'error', 'message' => 'Invalid email format.'];
@@ -73,6 +93,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
             // Commit the transaction
             $conn->commit();
+            
+            // Audit log successful employee creation (CIA - Availability)
+            audit_log($conn, 'employee_created', "Created employee: $full_name (Email: $email, Role ID: $role_id)", 'employee_management');
+            
             $_SESSION['flash_message'] = ['type' => 'success', 'message' => 'Employee added successfully!'];
             header('Location: ' . url_for('employees.php'));
             exit();
@@ -107,9 +131,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
         if ($stmt->execute()) {
             $message = ($new_status == 1) ? 'Employee account has been activated.' : 'Employee account has been deactivated.';
+            
+            // Audit log status change (CIA - Availability & Integrity)
+            $action_type = ($new_status == 1) ? 'employee_activated' : 'employee_deactivated';
+            audit_log($conn, $action_type, "User ID: $user_id status changed to: $new_status", 'employee_management');
+            
             $_SESSION['flash_message'] = ['type' => 'success', 'message' => $message];
         } else {
             $_SESSION['flash_message'] = ['type' => 'error', 'message' => 'Failed to update employee status.'];
+            audit_log($conn, 'employee_status_update_failed', "Failed to update user ID: $user_id", 'employee_management');
         }
         $stmt->close();
         header('Location: ' . url_for('employees.php'));

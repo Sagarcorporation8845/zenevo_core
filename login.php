@@ -35,9 +35,12 @@ if (isset($_SESSION['login_error'])) {
 
     <div class="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-md">
         <div class="text-center">
-            <!-- You can replace this with your company logo -->
+            <!-- Company Logo -->
+            <div class="flex justify-center mb-4">
+                <img src="<?php echo url_for('assets/logo.svg'); ?>" alt="Company Inc." class="h-16 w-auto">
+            </div>
             <h2 class="text-2xl font-bold text-gray-900">
-                Company Portal Login
+                Portal Login
             </h2>
             <p class="mt-2 text-sm text-gray-600">
                 Sign in to access your dashboard

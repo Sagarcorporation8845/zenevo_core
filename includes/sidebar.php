@@ -10,7 +10,7 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
 ?>
 <div class="w-64 bg-gray-800 text-white flex flex-col no-scrollbar">
     <div class="p-4 border-b border-gray-700 flex items-center justify-center">
-        <h2 class="text-2xl font-bold">Company Inc.</h2>
+        <img src="<?php echo url_for('assets/logo.svg'); ?>" alt="Company Inc." class="h-12 w-auto">
     </div>
     <nav class="flex-1 px-2 py-4 space-y-2">
         <a href="<?php echo url_for('dashboard.php'); ?>" class="sidebar-link flex items-center px-4 py-2.5 rounded-md hover:bg-gray-700 <?php echo ($current_page == 'dashboard.php') ? 'active' : ''; ?>">
