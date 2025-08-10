@@ -45,15 +45,31 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
             </a>
         <?php endif; ?>
 
+        <a href="<?php echo url_for('my_attendance.php'); ?>" class="sidebar-link flex items-center px-4 py-2.5 rounded-md hover:bg-gray-700 <?php echo ($current_page == 'my_attendance.php') ? 'active' : ''; ?>">
+            My Attendance
+        </a>
+
         <?php if (has_permission($conn, 'manage_employees')): ?>
             <a href="<?php echo url_for('attendance_settings.php'); ?>" class="sidebar-link flex items-center px-4 py-2.5 rounded-md hover:bg-gray-700 <?php echo ($current_page == 'attendance_settings.php') ? 'active' : ''; ?>">
                 Attendance Settings
             </a>
         <?php endif; ?>
 
+        <?php if (check_role_access($conn, ['Admin','HR Manager','Finance Manager'])): ?>
+            <a href="<?php echo url_for('mailbox.php'); ?>" class="sidebar-link flex items-center px-4 py-2.5 rounded-md hover:bg-gray-700 <?php echo ($current_page == 'mailbox.php') ? 'active' : ''; ?>">
+                Mailbox
+            </a>
+        <?php endif; ?>
+
         <?php if (has_permission($conn, 'view_reports')): ?>
             <a href="<?php echo url_for('reports.php'); ?>" class="sidebar-link flex items-center px-4 py-2.5 rounded-md hover:bg-gray-700 <?php echo ($current_page == 'reports.php') ? 'active' : ''; ?>">
                 Reports
+            </a>
+        <?php endif; ?>
+
+        <?php if (check_role_access($conn, ['Admin','HR Manager','Team Lead'])): ?>
+            <a href="<?php echo url_for('devops.php'); ?>" class="sidebar-link flex items-center px-4 py-2.5 rounded-md hover:bg-gray-700 <?php echo ($current_page == 'devops.php') ? 'active' : ''; ?>">
+                DevOps
             </a>
         <?php endif; ?>
     </nav>
