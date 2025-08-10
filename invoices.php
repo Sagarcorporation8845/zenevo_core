@@ -40,9 +40,10 @@ $result = $conn->query($sql);
     <!-- Header with Action Button -->
     <div class="flex justify-between items-center mb-6">
         <h2 class="text-2xl font-semibold text-gray-700">All Invoices</h2>
-        <a href="create_invoice.php" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300">
-            + Create New Invoice
-        </a>
+        <div class="flex space-x-3">
+            <a href="finance_settings.php" class="bg-gray-700 hover:bg-gray-800 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300">Settings</a>
+            <a href="create_invoice.php" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300">+ Create New Invoice</a>
+        </div>
     </div>
 
     <!-- Flash Message Display -->

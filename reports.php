@@ -357,21 +357,22 @@ if (check_role_access($conn, ['Admin'])) {
         <div class="px-4 py-5 sm:p-6">
             <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Export Reports</h3>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <button class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition duration-300">
+                <a href="actions/export.php?type=employees" class="text-center bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition duration-300">
                     Export Employee List
-                </button>
-                <button class="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md transition duration-300">
+                </a>
+                <a href="actions/export.php?type=leaves&month=<?php echo e($filter_month); ?>" class="text-center bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md transition duration-300">
                     Export Leave Reports
-                </button>
-                <button class="bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-4 rounded-md transition duration-300">
+                </a>
+                <a href="actions/export.php?type=departments" class="text-center bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-4 rounded-md transition duration-300">
                     Export Department Summary
-                </button>
+                </a>
             </div>
         </div>
     </div>
 </div>
 
 <script>
+// Enable direct downloads instead of buttons
 function updateReports() {
     const month = document.getElementById('monthFilter').value;
     if (month) {
