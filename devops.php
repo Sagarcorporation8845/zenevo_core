@@ -68,7 +68,11 @@ if ($roleViewAll) {
           <option value="<?php echo e($s['id']); ?>"><?php echo e($s['name']); ?></option>
           <?php endwhile; ?>
         </select>
-        <input class="enhanced-input w-full" name="assignee_employee_id" placeholder="Assignee Employee ID (optional)" />
+        <div class="relative">
+          <input type="hidden" name="assignee_employee_id" id="assignee_employee_id" />
+          <input type="text" id="assignee_search" class="enhanced-input w-full" placeholder="Search teammate by name..." autocomplete="off" />
+          <div id="assignee_dropdown" class="absolute z-50 w-full bg-white border border-gray-300 rounded-md shadow-lg hidden max-h-48 overflow-y-auto"></div>
+        </div>
         <button class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">Add Task</button>
       </form>
     </div>
@@ -123,4 +127,106 @@ if ($roleViewAll) {
     </div>
   </div>
 </div>
+
+<script>
+// Team member search functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('assignee_search');
+    const hiddenInput = document.getElementById('assignee_employee_id');
+    const dropdown = document.getElementById('assignee_dropdown');
+    
+    if (!searchInput) return;
+    
+    let employees = [];
+    let searchTimeout;
+    
+    // Fetch employees list
+    function fetchEmployees() {
+        fetch('actions/search_employees.php')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    employees = data.employees;
+                }
+            })
+            .catch(error => console.error('Error fetching employees:', error));
+    }
+    
+    // Filter and display employees
+    function filterEmployees(query) {
+        if (query.length < 2) {
+            dropdown.classList.add('hidden');
+            return;
+        }
+        
+        const filtered = employees.filter(emp => 
+            emp.name.toLowerCase().includes(query.toLowerCase()) ||
+            emp.designation.toLowerCase().includes(query.toLowerCase()) ||
+            emp.department.toLowerCase().includes(query.toLowerCase())
+        );
+        
+        displayEmployees(filtered);
+    }
+    
+    // Display employee options
+    function displayEmployees(employeeList) {
+        if (employeeList.length === 0) {
+            dropdown.innerHTML = '<div class="p-2 text-gray-500 text-sm">No employees found</div>';
+            dropdown.classList.remove('hidden');
+            return;
+        }
+        
+        const html = employeeList.map(emp => `
+            <div class="p-2 hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-b-0" 
+                 onclick="selectEmployee(${emp.id}, '${emp.name}', '${emp.designation}', '${emp.department}')">
+                <div class="font-medium text-gray-900">${emp.name}</div>
+                <div class="text-sm text-gray-600">${emp.designation} • ${emp.department}</div>
+            </div>
+        `).join('');
+        
+        dropdown.innerHTML = html;
+        dropdown.classList.remove('hidden');
+    }
+    
+    // Handle search input
+    searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            filterEmployees(this.value);
+        }, 300);
+    });
+    
+    // Hide dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!searchInput.contains(e.target) && !dropdown.contains(e.target)) {
+            dropdown.classList.add('hidden');
+        }
+    });
+    
+    // Show dropdown when focusing on search input
+    searchInput.addEventListener('focus', function() {
+        if (this.value.length >= 2) {
+            filterEmployees(this.value);
+        }
+    });
+    
+    // Fetch employees on page load
+    fetchEmployees();
+});
+
+// Select employee function (called from dropdown)
+function selectEmployee(id, name, designation, department) {
+    document.getElementById('assignee_employee_id').value = id;
+    document.getElementById('assignee_search').value = `${name} (${designation})`;
+    document.getElementById('assignee_dropdown').classList.add('hidden');
+}
+
+// Clear selection
+function clearSelection() {
+    document.getElementById('assignee_employee_id').value = '';
+    document.getElementById('assignee_search').value = '';
+    document.getElementById('assignee_dropdown').classList.add('hidden');
+}
+</script>
+
 <?php include 'includes/footer.php'; ?>

@@ -90,7 +90,7 @@ if (isset($_SESSION['login_success'])) {
                 </button>
             </div>
                     <div class="flex items-center justify-between">
-                <a href="<?php echo url_for('forgot_password.php'); ?>" class="text-indigo-600 hover:text-indigo-800 text-sm">Forgot password?</a>
+                <a href="<?php echo url_for('forgot_password.php'); ?>" class="text-indigo-600 hover:text-indigo-800 text-sm">Reset via OTP</a>
             </div>
         </form>
     </div>

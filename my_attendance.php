@@ -484,10 +484,12 @@ if ($can_view_all) {
           <div class="bg-white border rounded-lg p-4 <?php echo $bgColor; ?>">
             <div class="flex items-center gap-3 mb-3">
               <?php if ($att['in_photo_base64']): ?>
-                <img src="data:image/jpeg;base64,<?php echo e($att['in_photo_base64']); ?>" 
-                     alt="Employee" class="w-12 h-12 rounded-full object-cover" />
+                <div class="w-12 h-12 rounded-full overflow-hidden bg-gray-200 flex-shrink-0">
+                  <img src="data:image/jpeg;base64,<?php echo e($att['in_photo_base64']); ?>" 
+                       alt="Employee Selfie" class="w-full h-full object-cover" />
+                </div>
               <?php else: ?>
-                <div class="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center">
+                <div class="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center flex-shrink-0">
                   <span class="text-gray-600 font-semibold"><?php echo strtoupper(substr($att['first_name'], 0, 1)); ?></span>
                 </div>
               <?php endif; ?>
