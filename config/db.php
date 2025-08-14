@@ -99,7 +99,7 @@ function require_login() {
 
 /**
  * Checks if the logged-in user has a specific permission.
- * Enhanced with audit logging for CIA - Availability & Integrity
+ * Enhanced with smart audit logging to reduce log noise
  * @param mysqli $conn The database connection object.
  * @param string $permissionName The name of the permission to check (e.g., 'manage_invoices').
  * @return bool True if the user has the permission, false otherwise.
@@ -111,6 +111,8 @@ function has_permission($conn, $permissionName) {
     }
 
     $role_id = $_SESSION['role_id'];
+    $user_id = $_SESSION['user_id'] ?? 0;
+    $ip_address = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
 
     $sql = "SELECT COUNT(*)
             FROM role_permissions rp
@@ -133,12 +135,52 @@ function has_permission($conn, $permissionName) {
 
     $has_perm = $count > 0;
     
-    // Audit log for security monitoring
+    // Smart audit logging - only log suspicious activity
     if (!$has_perm) {
-        audit_log($conn, 'permission_denied', "Access denied for permission: $permissionName", $permissionName);
+        // Check for rapid permission denials (potential malicious activity)
+        $recent_denials = check_recent_permission_denials($conn, $user_id, $ip_address, 60); // Last 60 seconds
+        
+        if ($recent_denials > 3) {
+            // Log suspicious activity - multiple rapid denials
+            audit_log($conn, 'permission_denied_suspicious', "Multiple rapid denials for permission: $permissionName (Count: $recent_denials)", $permissionName);
+        } else {
+            // Only log if this is a sensitive permission or first few attempts
+            $sensitive_permissions = ['manage_invoices', 'view_reports', 'manage_employees', 'manage_documents', 'manage_leaves'];
+            if (in_array($permissionName, $sensitive_permissions) && $recent_denials <= 2) {
+                audit_log($conn, 'permission_denied', "Access denied for permission: $permissionName", $permissionName);
+            }
+        }
     }
 
     return $has_perm;
+}
+
+/**
+ * Check recent permission denials for a user/IP to detect suspicious activity
+ * @param mysqli $conn Database connection
+ * @param int $user_id User ID
+ * @param string $ip_address IP address
+ * @param int $seconds Time window in seconds
+ * @return int Number of recent denials
+ */
+function check_recent_permission_denials($conn, $user_id, $ip_address, $seconds = 60) {
+    $sql = "SELECT COUNT(*) FROM audit_logs 
+            WHERE (user_id = ? OR ip_address = ?) 
+            AND action IN ('permission_denied', 'permission_denied_suspicious')
+            AND created_at >= DATE_SUB(NOW(), INTERVAL ? SECOND)";
+    
+    $stmt = $conn->prepare($sql);
+    if (!$stmt) {
+        return 0;
+    }
+    
+    $stmt->bind_param("isi", $user_id, $ip_address, $seconds);
+    $stmt->execute();
+    $stmt->bind_result($count);
+    $stmt->fetch();
+    $stmt->close();
+    
+    return $count;
 }
 
 /**
