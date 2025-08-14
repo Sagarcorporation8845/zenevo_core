@@ -21,6 +21,7 @@ require_login(); // This function is from db.php
     <!-- The $pageTitle variable should be set on each page before including the header -->
     <title><?php echo isset($pageTitle) ? e($pageTitle) . ' - ' : ''; ?>HR & Finance</title>
     <link rel="stylesheet" href="<?php echo url_for('assets/css/app.css'); ?>">
+    <link rel="stylesheet" href="<?php echo url_for('assets/css/custom-improvements.css'); ?>">
 </head>
 <body class="h-full font-sans">
     <div class="flex h-screen bg-gray-200">
