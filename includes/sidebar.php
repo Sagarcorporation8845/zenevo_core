@@ -72,5 +72,11 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
                 DevOps
             </a>
         <?php endif; ?>
+
+        <?php if (has_permission($conn, 'view_audit_logs')): ?>
+            <a href="<?php echo url_for('audit_logs.php'); ?>" class="sidebar-link flex items-center px-4 py-2.5 rounded-md hover:bg-gray-700 <?php echo ($current_page == 'audit_logs.php') ? 'active' : ''; ?>">
+                Security Logs
+            </a>
+        <?php endif; ?>
     </nav>
 </div>
