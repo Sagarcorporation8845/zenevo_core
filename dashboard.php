@@ -47,25 +47,85 @@ include 'includes/header.php';
     ?>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <!-- Example Dashboard Card 1 -->
+        <!-- Tasks Completed This Month -->
         <div class="bg-white p-6 rounded-lg shadow-md">
-            <h3 class="text-lg font-semibold text-gray-700">Total Employees</h3>
+            <h3 class="text-lg font-semibold text-gray-700">Tasks Completed</h3>
             <?php
-                // Example of fetching data for the dashboard
-                $result = $conn->query("SELECT COUNT(*) as count FROM employees");
-                $count = $result->fetch_assoc()['count'];
+                $currentMonth = date('Y-m');
+                $currentUserId = $_SESSION['user_id'];
+                $currentEmployeeId = null;
+                
+                // Get current employee ID
+                if ($st = $conn->prepare('SELECT id FROM employees WHERE user_id = ? LIMIT 1')) {
+                    $st->bind_param('i', $currentUserId);
+                    $st->execute();
+                    $st->bind_result($currentEmployeeId);
+                    $st->fetch();
+                    $st->close();
+                }
+                
+                $completedTasks = 0;
+                if ($currentEmployeeId && $stmt = $conn->prepare("SELECT COUNT(*) FROM tasks WHERE assignee_employee_id = ? AND status = 'Done' AND DATE_FORMAT(created_at, '%Y-%m') = ?")) {
+                    $stmt->bind_param('is', $currentEmployeeId, $currentMonth);
+                    $stmt->execute();
+                    $stmt->bind_result($completedTasks);
+                    $stmt->fetch();
+                    $stmt->close();
+                }
             ?>
-            <p class="text-3xl font-bold text-indigo-600 mt-2"><?php echo e($count); ?></p>
+            <p class="text-3xl font-bold text-green-600 mt-2"><?php echo e($completedTasks); ?></p>
+            <p class="text-xs text-gray-500">This month</p>
         </div>
 
-        <!-- Example Dashboard Card 2 -->
+        <!-- Pending Tasks -->
         <div class="bg-white p-6 rounded-lg shadow-md">
-            <h3 class="text-lg font-semibold text-gray-700">Pending Leave Requests</h3>
-             <?php
-                $result = $conn->query("SELECT COUNT(*) as count FROM leaves WHERE status = 'Pending'");
-                $count = $result->fetch_assoc()['count'];
+            <h3 class="text-lg font-semibold text-gray-700">Pending Tasks</h3>
+            <?php
+                $pendingTasks = 0;
+                if ($currentEmployeeId && $stmt = $conn->prepare("SELECT COUNT(*) FROM tasks WHERE assignee_employee_id = ? AND status IN ('Todo', 'In Progress', 'Blocked')")) {
+                    $stmt->bind_param('i', $currentEmployeeId);
+                    $stmt->execute();
+                    $stmt->bind_result($pendingTasks);
+                    $stmt->fetch();
+                    $stmt->close();
+                }
             ?>
-            <p class="text-3xl font-bold text-orange-600 mt-2"><?php echo e($count); ?></p>
+            <p class="text-3xl font-bold text-orange-600 mt-2"><?php echo e($pendingTasks); ?></p>
+            <p class="text-xs text-gray-500">Active tasks</p>
+        </div>
+
+        <!-- Present Days This Month -->
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h3 class="text-lg font-semibold text-gray-700">Present Days</h3>
+            <?php
+                $presentDays = 0;
+                if ($currentEmployeeId && $stmt = $conn->prepare("SELECT COUNT(DISTINCT date) FROM attendance WHERE employee_id = ? AND clock_in_time IS NOT NULL AND DATE_FORMAT(date, '%Y-%m') = ?")) {
+                    $stmt->bind_param('is', $currentEmployeeId, $currentMonth);
+                    $stmt->execute();
+                    $stmt->bind_result($presentDays);
+                    $stmt->fetch();
+                    $stmt->close();
+                }
+            ?>
+            <p class="text-3xl font-bold text-blue-600 mt-2"><?php echo e($presentDays); ?></p>
+            <p class="text-xs text-gray-500">This month</p>
+        </div>
+
+        <!-- Notifications -->
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h3 class="text-lg font-semibold text-gray-700">Notifications</h3>
+            <?php
+                $unreadNotifications = 0;
+                if ($stmt = $conn->prepare("SELECT COUNT(*) FROM notifications WHERE user_id = ? AND is_read = 0")) {
+                    $stmt->bind_param('i', $currentUserId);
+                    $stmt->execute();
+                    $stmt->bind_result($unreadNotifications);
+                    $stmt->fetch();
+                    $stmt->close();
+                }
+            ?>
+            <p class="text-3xl font-bold text-purple-600 mt-2"><?php echo e($unreadNotifications); ?></p>
+            <p class="text-xs text-gray-500">Unread messages</p>
         </div>
 
         <?php if ($can_view_finance): ?>

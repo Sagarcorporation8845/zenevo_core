@@ -7,6 +7,7 @@ $conn->query("CREATE TABLE IF NOT EXISTS sprints (id INT AUTO_INCREMENT PRIMARY 
 $conn->query("CREATE TABLE IF NOT EXISTS tasks (id INT AUTO_INCREMENT PRIMARY KEY, sprint_id INT NULL, title VARCHAR(200) NOT NULL, description TEXT NULL, status ENUM('Todo','In Progress','Blocked','Done') DEFAULT 'Todo', assignee_employee_id INT NULL, created_by INT NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)");
 
 $roleViewAll = check_role_access($conn, ['Admin','Team Lead','HR Manager']);
+$isManager = check_role_access($conn, ['Manager']);
 $currentUserId = $_SESSION['user_id'];
 $currentEmployeeId = null;
 if ($st = $conn->prepare('SELECT id FROM employees WHERE user_id = ? LIMIT 1')) {
@@ -17,16 +18,51 @@ if ($st = $conn->prepare('SELECT id FROM employees WHERE user_id = ? LIMIT 1')) 
   $st->close();
 }
 
+// Get manager's team members if user is a manager
+$teamMembers = [];
+if ($isManager && $currentEmployeeId) {
+    $teamQuery = $conn->prepare("SELECT e.id, CONCAT(e.first_name, ' ', e.last_name) as name, e.designation, e.department
+                                FROM employee_managers em
+                                JOIN employees e ON em.employee_id = e.id
+                                JOIN users u ON e.user_id = u.id
+                                WHERE em.manager_id = ? AND em.is_active = 1 AND u.is_active = 1
+                                ORDER BY e.first_name, e.last_name");
+    $teamQuery->bind_param('i', $currentEmployeeId);
+    $teamQuery->execute();
+    $teamResult = $teamQuery->get_result();
+    while ($member = $teamResult->fetch_assoc()) {
+        $teamMembers[] = $member;
+    }
+    $teamQuery->close();
+}
+
 // Fetch data
 $sprints = $conn->query('SELECT * FROM sprints ORDER BY start_date DESC');
 
 if ($roleViewAll) {
-  $tasks = $conn->query('SELECT t.*, CONCAT(e.first_name, " ", e.last_name) AS assignee
-                         FROM tasks t LEFT JOIN employees e ON t.assignee_employee_id=e.id ORDER BY t.created_at DESC LIMIT 200');
+  $tasks = $conn->query('SELECT t.*, CONCAT(e.first_name, " ", e.last_name) AS assignee, s.name as sprint_name
+                         FROM tasks t 
+                         LEFT JOIN employees e ON t.assignee_employee_id=e.id 
+                         LEFT JOIN sprints s ON t.sprint_id = s.id
+                         ORDER BY t.created_at DESC LIMIT 200');
+} elseif ($isManager && $currentEmployeeId) {
+  // Managers see tasks assigned to their team members
+  $ts = $conn->prepare('SELECT t.*, CONCAT(e.first_name, " ", e.last_name) AS assignee, s.name as sprint_name
+                        FROM tasks t 
+                        LEFT JOIN employees e ON t.assignee_employee_id=e.id
+                        LEFT JOIN sprints s ON t.sprint_id = s.id
+                        LEFT JOIN employee_managers em ON e.id = em.employee_id
+                        WHERE (em.manager_id = ? AND em.is_active = 1) OR t.assignee_employee_id IS NULL OR t.created_by = ?
+                        ORDER BY t.created_at DESC LIMIT 200');
+  $ts->bind_param('ii', $currentEmployeeId, $currentUserId);
+  $ts->execute();
+  $tasks = $ts->get_result();
 } else {
   // Employees see tasks assigned to them or unassigned (broadcast)
-  $ts = $conn->prepare('SELECT t.*, CONCAT(e.first_name, " ", e.last_name) AS assignee
-                        FROM tasks t LEFT JOIN employees e ON t.assignee_employee_id=e.id
+  $ts = $conn->prepare('SELECT t.*, CONCAT(e.first_name, " ", e.last_name) AS assignee, s.name as sprint_name
+                        FROM tasks t 
+                        LEFT JOIN employees e ON t.assignee_employee_id=e.id
+                        LEFT JOIN sprints s ON t.sprint_id = s.id
                         WHERE t.assignee_employee_id = ? OR t.assignee_employee_id IS NULL
                         ORDER BY t.created_at DESC LIMIT 200');
   $ts->bind_param('i', $currentEmployeeId);
@@ -40,7 +76,7 @@ if ($roleViewAll) {
   </div>
 
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-    <?php if ($roleViewAll): ?>
+    <?php if ($roleViewAll || $isManager): ?>
     <!-- Create Sprint -->
     <div class="bg-white p-6 rounded shadow">
       <h3 class="text-lg font-semibold mb-4">Create Sprint</h3>
@@ -73,6 +109,30 @@ if ($roleViewAll) {
           <input type="text" id="assignee_search" class="enhanced-input w-full" placeholder="Search teammate by name..." autocomplete="off" />
           <div id="assignee_dropdown" class="absolute z-50 w-full bg-white border border-gray-300 rounded-md shadow-lg hidden max-h-48 overflow-y-auto"></div>
         </div>
+        
+        <?php if ($isManager && !empty($teamMembers)): ?>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Quick Assign to Team Member</label>
+          <div class="grid grid-cols-2 gap-2">
+            <?php foreach ($teamMembers as $member): ?>
+              <button type="button" onclick="selectEmployee(<?php echo $member['id']; ?>, '<?php echo e($member['name']); ?>', '<?php echo e($member['designation']); ?>', '<?php echo e($member['department']); ?>')" 
+                      class="text-xs px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded text-left">
+                <?php echo e($member['name']); ?>
+              </button>
+            <?php endforeach; ?>
+          </div>
+        </div>
+        <?php endif; ?>
+
+        <div class="grid grid-cols-2 gap-3">
+          <select name="priority" class="enhanced-input">
+            <option value="Medium">Medium Priority</option>
+            <option value="Low">Low Priority</option>
+            <option value="High">High Priority</option>
+            <option value="Critical">Critical Priority</option>
+          </select>
+          <input type="date" name="deadline" class="enhanced-input" placeholder="Deadline (optional)" />
+        </div>
         <button class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">Add Task</button>
       </form>
     </div>
@@ -104,24 +164,106 @@ if ($roleViewAll) {
   </div>
 
   <div class="bg-white p-6 rounded shadow mt-8">
-    <h3 class="text-lg font-semibold mb-4"><?php echo $roleViewAll ? 'Recent Tasks' : 'My and Broadcast Tasks'; ?></h3>
+    <h3 class="text-lg font-semibold mb-4">
+      <?php 
+      if ($roleViewAll) {
+          echo 'All Tasks';
+      } elseif ($isManager) {
+          echo 'Team Tasks';
+      } else {
+          echo 'My Tasks';
+      }
+      ?>
+    </h3>
     <div class="overflow-x-auto">
       <table class="min-w-full">
         <thead class="bg-gray-50"><tr>
           <th class="px-4 py-2 text-left text-xs font-semibold uppercase text-gray-600">Title</th>
+          <th class="px-4 py-2 text-left text-xs font-semibold uppercase text-gray-600">Sprint</th>
           <th class="px-4 py-2 text-left text-xs font-semibold uppercase text-gray-600">Status</th>
+          <th class="px-4 py-2 text-left text-xs font-semibold uppercase text-gray-600">Priority</th>
           <th class="px-4 py-2 text-left text-xs font-semibold uppercase text-gray-600">Assignee</th>
           <th class="px-4 py-2 text-left text-xs font-semibold uppercase text-gray-600">Created</th>
+          <?php if ($roleViewAll || $isManager): ?>
+          <th class="px-4 py-2 text-center text-xs font-semibold uppercase text-gray-600">Actions</th>
+          <?php endif; ?>
         </tr></thead>
         <tbody>
-          <?php while($t = $tasks->fetch_assoc()): ?>
-            <tr class="border-b">
-              <td class="px-4 py-2 text-sm"><?php echo e($t['title']); ?></td>
-              <td class="px-4 py-2 text-sm"><?php echo e($t['status']); ?></td>
-              <td class="px-4 py-2 text-sm"><?php echo e($t['assignee'] ?: 'All Employees'); ?></td>
-              <td class="px-4 py-2 text-sm text-gray-500"><?php echo date('Y-m-d H:i', strtotime($t['created_at'])); ?></td>
+          <?php if ($tasks && $tasks->num_rows > 0): ?>
+            <?php while($t = $tasks->fetch_assoc()): ?>
+              <tr class="border-b hover:bg-gray-50">
+                <td class="px-4 py-2">
+                  <div class="text-sm font-medium text-gray-900"><?php echo e($t['title']); ?></div>
+                  <?php if ($t['description']): ?>
+                    <div class="text-xs text-gray-500"><?php echo e(substr($t['description'], 0, 100)) . (strlen($t['description']) > 100 ? '...' : ''); ?></div>
+                  <?php endif; ?>
+                </td>
+                <td class="px-4 py-2 text-sm">
+                  <?php if ($t['sprint_name']): ?>
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                      <?php echo e($t['sprint_name']); ?>
+                    </span>
+                  <?php else: ?>
+                    <span class="text-gray-400">No Sprint</span>
+                  <?php endif; ?>
+                </td>
+                <td class="px-4 py-2">
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                    <?php 
+                    switch($t['status']) {
+                        case 'Todo': echo 'bg-gray-100 text-gray-800'; break;
+                        case 'In Progress': echo 'bg-yellow-100 text-yellow-800'; break;
+                        case 'Blocked': echo 'bg-red-100 text-red-800'; break;
+                        case 'Done': echo 'bg-green-100 text-green-800'; break;
+                        default: echo 'bg-gray-100 text-gray-800'; break;
+                    }
+                    ?>">
+                    <?php echo e($t['status']); ?>
+                  </span>
+                </td>
+                <td class="px-4 py-2">
+                  <?php if (isset($t['priority'])): ?>
+                    <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium
+                      <?php 
+                      switch($t['priority']) {
+                          case 'Critical': echo 'bg-red-100 text-red-800'; break;
+                          case 'High': echo 'bg-orange-100 text-orange-800'; break;
+                          case 'Medium': echo 'bg-blue-100 text-blue-800'; break;
+                          case 'Low': echo 'bg-gray-100 text-gray-800'; break;
+                          default: echo 'bg-gray-100 text-gray-800'; break;
+                      }
+                      ?>">
+                      <?php echo e($t['priority'] ?? 'Medium'); ?>
+                    </span>
+                  <?php endif; ?>
+                </td>
+                <td class="px-4 py-2 text-sm"><?php echo e($t['assignee'] ?: 'All Employees'); ?></td>
+                <td class="px-4 py-2 text-sm text-gray-500"><?php echo date('M j, Y', strtotime($t['created_at'])); ?></td>
+                <?php if ($roleViewAll || $isManager): ?>
+                <td class="px-4 py-2 text-center">
+                  <div class="flex justify-center space-x-2">
+                    <button onclick="editTask(<?php echo $t['id']; ?>)" class="text-blue-600 hover:text-blue-900 text-xs">
+                      Edit
+                    </button>
+                    <form action="actions/devops_action.php" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this task?')">
+                      <input type="hidden" name="action" value="delete_task">
+                      <input type="hidden" name="task_id" value="<?php echo $t['id']; ?>">
+                      <button type="submit" class="text-red-600 hover:text-red-900 text-xs">
+                        Delete
+                      </button>
+                    </form>
+                  </div>
+                </td>
+                <?php endif; ?>
+              </tr>
+            <?php endwhile; ?>
+          <?php else: ?>
+            <tr>
+              <td colspan="<?php echo ($roleViewAll || $isManager) ? '7' : '6'; ?>" class="text-center py-8 text-gray-500">
+                No tasks found. Create your first task above!
+              </td>
             </tr>
-          <?php endwhile; ?>
+          <?php endif; ?>
         </tbody>
       </table>
     </div>

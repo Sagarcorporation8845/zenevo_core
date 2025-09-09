@@ -32,6 +32,31 @@ require_login(); // This function is from db.php
                     <h1 class="text-2xl font-bold text-gray-800"><?php echo isset($pageTitle) ? e($pageTitle) : 'Dashboard'; ?></h1>
                 </div>
                 <div class="flex items-center space-x-4">
+                    <!-- Notification Bell -->
+                    <div class="relative">
+                        <button id="notificationBell" class="relative p-2 text-gray-600 hover:text-gray-800 focus:outline-none focus:text-gray-800">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM9 17H4l5 5v-5zM12 3v9m0 0l3-3m-3 3l-3-3"></path>
+                            </svg>
+                            <span id="notificationCount" class="absolute -top-1 -right-1 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full hidden"></span>
+                        </button>
+                        
+                        <!-- Notification Dropdown -->
+                        <div id="notificationDropdown" class="absolute right-0 mt-2 w-80 bg-white rounded-md shadow-lg z-50 hidden">
+                            <div class="py-2 max-h-96 overflow-y-auto">
+                                <div class="px-4 py-2 text-sm font-semibold text-gray-700 border-b">
+                                    Recent Notifications
+                                </div>
+                                <div id="notificationList" class="divide-y divide-gray-100">
+                                    <!-- Notifications will be loaded here -->
+                                </div>
+                                <div class="px-4 py-2 text-center border-t">
+                                    <a href="<?php echo url_for('notifications.php'); ?>" class="text-sm text-indigo-600 hover:text-indigo-800">View All Notifications</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <span class="text-sm font-medium text-gray-600">Welcome, <?php echo e($_SESSION['user_name']); ?></span>
                     <a href="<?php echo url_for('logout.php'); ?>" class="text-sm font-medium text-indigo-600 hover:text-indigo-800">Logout</a>
                 </div>
