@@ -73,6 +73,26 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
             </a>
         <?php endif; ?>
 
+        <?php if (check_role_access($conn, ['Admin', 'HR Manager'])): ?>
+            <a href="<?php echo url_for('resource_management.php'); ?>" class="sidebar-link flex items-center px-4 py-2.5 rounded-md hover:bg-gray-700 <?php echo ($current_page == 'resource_management.php') ? 'active' : ''; ?>">
+                Resource Management
+            </a>
+        <?php endif; ?>
+
+        <a href="<?php echo url_for('notifications.php'); ?>" class="sidebar-link flex items-center px-4 py-2.5 rounded-md hover:bg-gray-700 <?php echo ($current_page == 'notifications.php') ? 'active' : ''; ?>">
+            Notifications
+        </a>
+
+        <a href="<?php echo url_for('messages.php'); ?>" class="sidebar-link flex items-center px-4 py-2.5 rounded-md hover:bg-gray-700 <?php echo ($current_page == 'messages.php') ? 'active' : ''; ?>">
+            Messages
+        </a>
+
+        <?php if (check_role_access($conn, ['Admin', 'HR Manager', 'Manager', 'Team Lead'])): ?>
+        <a href="<?php echo url_for('productivity_dashboard.php'); ?>" class="sidebar-link flex items-center px-4 py-2.5 rounded-md hover:bg-gray-700 <?php echo ($current_page == 'productivity_dashboard.php') ? 'active' : ''; ?>">
+            Productivity
+        </a>
+        <?php endif; ?>
+
         <?php if (has_permission($conn, 'view_audit_logs')): ?>
             <a href="<?php echo url_for('audit_logs.php'); ?>" class="sidebar-link flex items-center px-4 py-2.5 rounded-md hover:bg-gray-700 <?php echo ($current_page == 'audit_logs.php') ? 'active' : ''; ?>">
                 Security Logs
